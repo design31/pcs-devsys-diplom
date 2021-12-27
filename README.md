@@ -1,6 +1,7 @@
 # Курсовая работа по итогам модуля "DevOps и системное администрирование"
 
-## Установим и настроим `ufw`:
+ ## Установим и настроим `ufw`:
+ 
 ```
 us@nginx:~$ sudo ufw enable
 Firewall is active and enabled on system startup
@@ -27,7 +28,7 @@ To                         Action      From
 443/tcp (v6)               ALLOW IN    Anywhere (v6)
 ```
 
-## Установим hashicorp vault и выпустим сертификат с его помощью:
+ ## Установим hashicorp vault и выпустим сертификат с его помощью:
 
 ```
 
