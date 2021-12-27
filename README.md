@@ -153,4 +153,27 @@ Root Token: root
 
 Development mode should NOT be used in production installations!
 ```
+Создадим переменные окружения:
 
+```
+us@nginx:~$ export VAULT_ADDR=http://127.0.0.1:8200
+us@nginx:~$ export VAULT_TOKEN=root
+```
+Создадим корневой сертификат сроком на 10 лет:
+```
+us@nginx:~$ vault secrets enable pki
+Success! Enabled the pki secrets engine at: pki/
+us@nginx:~$ vault secrets tune -max-lease-ttl=87600h pki
+Success! Tuned the secrets engine at: pki/
+us@nginx:~$ vault write -field=certificate pki/root/generate/internal \
+>      common_name="netology.io" \
+>      ttl=87600h > CA_cert.crt
+us@nginx:~$ vault write pki/config/urls \
+>      issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+>      crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+Success! Data written to: pki/config/urls
+```
+
+```
+
+```
