@@ -297,3 +297,22 @@ MdGsCfnkzW9pGkPR0/BfkVC8ZdUw7uoO3471rkTIyqkOklwqnwfkbRkAQFGRmKUW
 private_key_type    rsa
 serial_number       0e:16:57:aa:fd:c9:12:0c:89:71:fe:df:b3:0a:d2:b0:6d:67:8c:74
 ```
+Установка nginx и страницы по адресу `test.netology.io`:
+```
+us@nginx:~$ sudo apt install nginx
+us@nginx:~$ systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2021-12-28 10:07:52 +07; 2min 46s ago
+     ...
+     
+us@nginx:~$ sudo mkdir -p /var/www/test.netology.io/html
+us@nginx:~$ sudo chown -R $USER:$USER /var/www/test.netology.io/html
+us@nginx:~$ sudo chmod -R 755 /var/www/test.netology.io/html
+us@nginx:~$ nano /var/www/test.netology.io/index.html
+us@nginx:~$ sudo nano /etc/nginx/sites-available/test.netology.io
+us@nginx:~$ sudo ln -s /etc/nginx/sites-available/test.netology.io /etc/nginx/sites-enabled/
+us@nginx:~$ sudo systemctl restart nginx
+```
+Видим страничку по адресу http://test.netology.io:
+![Картинка screen1](img/screen1.jpg)
