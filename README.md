@@ -158,7 +158,7 @@ Development mode should NOT be used in production installations!
 us@nginx:~$ export VAULT_ADDR=http://127.0.0.1:8200
 us@nginx:~$ export VAULT_TOKEN=root
 ```
-Создадим корневой сертификат сроком на месяц:
+Создадим корневой сертификат сроком 31 день:
 ```
 us@nginx:~$ vault secrets enable pki
 Success! Enabled the pki secrets engine at: pki/
@@ -172,7 +172,18 @@ us@nginx:~$ vault write pki/config/urls \
 >      crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
 Success! Data written to: pki/config/urls
 ```
-
+Создадим промежуточный сертификат сроком 30 дней:
 ```
-
+us@nginx:~$ vault secrets enable -path=pki_int pki
+Success! Enabled the pki secrets engine at: pki_int/
+us@nginx:~$ vault secrets tune -max-lease-ttl=720h pki_int
+Success! Tuned the secrets engine at: pki_int/
+us@nginx:~$ vault write -format=json pki_int/intermediate/generate/internal \
+>      common_name="netology.io Intermediate Authority" \
+>      | jq -r '.data.csr' > pki_intermediate.csr
+us@nginx:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \
+>      format=pem_bundle ttl="720h" \
+>      | jq -r '.data.certificate' > intermediate.cert.pem
+us@nginx:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+Success! Data written to: pki_int/intermediate/set-signed
 ```
