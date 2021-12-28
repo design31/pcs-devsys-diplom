@@ -187,3 +187,38 @@ us@nginx:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_interme
 us@nginx:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
 Success! Data written to: pki_int/intermediate/set-signed
 ```
+
+Создадим роль:
+```
+us@nginx:~$ vault write pki_int/roles/netology-dot-io \
+>      allowed_domains="netology.io" \
+>      allow_subdomains=true \
+>      max_ttl="720h"
+Success! Data written to: pki_int/roles/netology-dot-io
+```
+Теперь мы можем выпустить сертификат для роли `netology-dot-io` для поддомена `test.netology.io`
+```
+us@nginx:~$ vault write pki_int/issue/netology-dot-io common_name="test.netology.io" ttl="72h"
+Key                 Value
+---                 -----
+ca_chain            [-----BEGIN CERTIFICATE-----
+MIIDpjCCAo6gAwIBAgIUTDQxRNuKis88LPKS6GoaB91u/6EwDQYJKoZIhvcNAQEL
+...
+-----END CERTIFICATE-----]
+certificate         -----BEGIN CERTIFICATE-----
+MIIDZjCCAk6gAwIBAgIUDhZXqv3JEgyJcf7fswrSsG1njHQwDQYJKoZIhvcNAQEL
+...
+-----END CERTIFICATE-----
+expiration          1640919580
+issuing_ca          -----BEGIN CERTIFICATE-----
+MIIDpjCCAo6gAwIBAgIUTDQxRNuKis88LPKS6GoaB91u/6EwDQYJKoZIhvcNAQEL
+...
+-----END CERTIFICATE-----
+private_key         -----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAzoY87gjd85nNXO7n2wQwpngu/40RJX50aycYSlyaUHKeix//
+8E4QF/DUiFr2VsAoogUDiKfUIxgpTR9+XEIcoef6XZMoBwBD4Ju2OOh/KxWcbs/x
+...
+-----END RSA PRIVATE KEY-----
+private_key_type    rsa
+serial_number       0e:16:57:aa:fd:c9:12:0c:89:71:fe:df:b3:0a:d2:b0:6d:67:8c:74
+```
