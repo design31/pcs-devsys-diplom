@@ -316,3 +316,6 @@ us@nginx:~$ sudo systemctl restart nginx
 ```
 Видим страничку по адресу http://test.netology.io:
 ![Картинка screen1](img/screen1.jpg)
+
+Далее по предложенной инструкции устанавливаю корневой сертификат на хост и пробую открыть страницы по https:
+![Картинка screen2](img/screen2.jpg)
