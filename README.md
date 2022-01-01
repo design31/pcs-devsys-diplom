@@ -172,7 +172,7 @@ us@nginx:~$ vault write pki/config/urls \
 >      crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
 Success! Data written to: pki/config/urls
 ```
-Создадим промежуточный сертификат сроком 30 дней:
+Создадим промежуточный сертификат:
 ```
 us@nginx:~$ vault secrets enable -path=pki_int pki
 Success! Enabled the pki secrets engine at: pki_int/
@@ -182,7 +182,7 @@ us@nginx:~$ vault write -format=json pki_int/intermediate/generate/internal \
 >      common_name="netology.io Intermediate Authority" \
 >      | jq -r '.data.csr' > pki_intermediate.csr
 us@nginx:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \
->      format=pem_bundle ttl="720h" \
+>      format=pem_bundle ttl="43800h" \
 >      | jq -r '.data.certificate' > intermediate.cert.pem
 us@nginx:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
 Success! Data written to: pki_int/intermediate/set-signed
@@ -191,9 +191,11 @@ Success! Data written to: pki_int/intermediate/set-signed
 Создадим роль:
 ```
 us@nginx:~$ vault write pki_int/roles/netology-dot-io \
->      allowed_domains="netology.io" \
->      allow_subdomains=true \
->      max_ttl="720h"
+     allowed_domains="test.netology.io" \
+     allow_bare_domains=true \
+     alt_names="test.netology.io" \
+     allow_subdomains=true \
+     max_ttl="720h"
 Success! Data written to: pki_int/roles/netology-dot-io
 ```
 Теперь мы можем выпустить сертификат для роли `netology-dot-io` для поддомена `test.netology.io`. Выгружать его буду в файл all.crt а из него уже раскидывать по файлам ключей и сертификатов.  
@@ -225,3 +227,13 @@ us@nginx:~$ sudo systemctl restart nginx
 
 Далее по предложенной инструкции устанавливаю корневой сертификат на хост и пробую открыть страницы по https:
 ![Картинка screen2](img/screen2.jpg)
+
+Создадим скрипт для перевыпуска сертификата сроком на 30 дней и ключа, а также перезапуска nginx:
+```bash
+#!/usr/bin/env bash
+vault write -format=json pki_int/issue/netology-dot-io common_name="test.netology.io" ttl="720h" > /home/us/all.crt
+cat all.crt | jq -r .data.certificate > /home/us/test.netology.io.crt
+cat all.crt | jq -r .data.issuing_ca >> /home/us/test.netology.io.crt
+cat all.crt | jq -r .data.private_key > /home/us/test.netology.io.key
+systemctl restart nginx.service
+```
