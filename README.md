@@ -228,7 +228,7 @@ us@nginx:~$ sudo systemctl restart nginx
 Далее по предложенной инструкции устанавливаю корневой сертификат на хост и пробую открыть страницы по https:
 ![Картинка screen2](img/screen2.jpg)
 
-Создадим скрипты для перевыпуска сертификата сроком на 30 дней и ключа, а также перезапуска nginx:
+Создадим скрипты для перевыпуска сертификата сроком на 30 дней и ключа(в папке пользователя us), а также перезапуска nginx(в папке пользователя root):
 ```bash
 #!/usr/bin/env bash
 vault write -format=json pki_int/issue/netology-dot-io common_name="test.netology.io" ttl="720h" > /home/us/all.crt
