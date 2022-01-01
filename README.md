@@ -228,12 +228,26 @@ us@nginx:~$ sudo systemctl restart nginx
 Далее по предложенной инструкции устанавливаю корневой сертификат на хост и пробую открыть страницы по https:
 ![Картинка screen2](img/screen2.jpg)
 
-Создадим скрипт для перевыпуска сертификата сроком на 30 дней и ключа, а также перезапуска nginx:
+Создадим скрипты для перевыпуска сертификата сроком на 30 дней и ключа, а также перезапуска nginx:
 ```bash
 #!/usr/bin/env bash
 vault write -format=json pki_int/issue/netology-dot-io common_name="test.netology.io" ttl="720h" > /home/us/all.crt
 cat all.crt | jq -r .data.certificate > /home/us/test.netology.io.crt
 cat all.crt | jq -r .data.issuing_ca >> /home/us/test.netology.io.crt
 cat all.crt | jq -r .data.private_key > /home/us/test.netology.io.key
+```
+```bash
+#!/usr/bin/env bash
 systemctl restart nginx.service
 ```
+Добавим скрипт на первыпуск сертификата сроком на 30 дней 1-го числа каждого месяца в 00часов 01 минуту в `crontab`:
+```
+us@nginx:~$ crontab -l
+1 0 1 * * /home/us/certupdate.sh
+```
+Добавим скрипт на перзапуск nginx 1-го числа каждого месяца в 00часов 02 минуты в `crontab` для пользователя root:
+```
+root@nginx:~# crontab -l
+2 0 1 * * /root/restartnginx.sh
+```
+Лучше было бы конечно перевыпускать сертификат каждый 29-й день к примеру, чтоб перекрыть месяцы с 31 днём, да ещё и срок сертификата у нас всего 30 дней. Но я сделал по заданию.  
