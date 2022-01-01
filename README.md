@@ -222,7 +222,7 @@ us@nginx:~$ sudo nano /etc/nginx/sites-available/test.netology.io
 us@nginx:~$ sudo ln -s /etc/nginx/sites-available/test.netology.io /etc/nginx/sites-enabled/
 us@nginx:~$ sudo systemctl restart nginx
 ```
-Видим страничку по адресу http://test.netology.io:
+Видим страничку по адресу http://test.netology.io(тут я на время открывал порт 80 для проверки):
 ![Картинка screen1](img/screen1.jpg)
 
 Далее по предложенной инструкции устанавливаю корневой сертификат на хост и пробую открыть страницы по https:
